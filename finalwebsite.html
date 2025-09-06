@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>EcoFinds - Sustainable Marketplace</title>
+
+    <!-- PWA and Mobile App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#10B981">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/10B981/FFFFFF?text=Eco">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- internal css -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-input {
+            width: 100%;
+            height: 3rem;
+            padding: 0.5rem 1rem;
+            margin-top: 0.5rem;
+            color: #374151;
+            background-color: #f9fafb;
+            border-width: 2px;
+            border-color: #e5e7eb;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: transparent;
+            box-shadow: 0 0 0 2px #34d399;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            margin-top: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #059669;
+            border-radius: 0.75rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+            outline: none;
+            border: none;
+        }
+
+        .btn:hover {
+            background-color: #047857;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+            transform: translateY(-0.25rem);
+        }
+
+        .btn:focus {
+            box-shadow: 0 0 0 2px #34d399;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            margin-top: 1rem;
+            font-weight: bold;
+            color: #374151;
+            background-color: #e5e7eb;
+            border-radius: 0.75rem;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(107, 114, 128, 0.1);
+            outline: none;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+            box-shadow: 0 4px 16px rgba(107, 114, 128, 0.15);
+            transform: translateY(-0.25rem);
+        }
+
+        .btn-secondary:focus {
+            box-shadow: 0 0 0 2px #a1a1aa;
+        }
+
+        .product-card {
+            background-color: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 1px solid #f3f4f6;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.15);
+            transform: translateY(-0.5rem);
+        }
+
+        .card {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f3f4f6;
+        }
+
+        @media (min-width: 640px) {
+            .card {
+                padding: 2rem;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        .bottom-nav-link.active {
+            color: #10B981;
+            transform: scale(1.1);
+        }
+
+        #splash-screen {
+            transition: opacity 0.5s ease-out;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800">
+
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="fixed inset-0 bg-emerald-600 z-[200] flex flex-col items-center justify-center">
+        <div class="flex items-center gap-4 text-white text-4xl font-bold pulse-animation">
+            <svg class="h-12 w-auto bg-white/20 text-white rounded-2xl p-2" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M16.6,15.2l-3.3-3.3c0.5-0.8,0.8-1.8,0.8-2.8c0-2.8-2.3-5.1-5.1-5.1S3.9,6.3,3.9,9.1s2.3,5.1,5.1,5.1c1,0,2-0.3,2.8-0.8l3.3,3.3c0.2,0.2,0.5,0.2,0.7,0l1.4-1.4C16.8,15.7,16.8,15.4,16.6,15.2z M9,12.2c-1.7,0-3.1-1.4-3.1-3.1s1.4-3.1,3.1-3.1s3.1,1.4,3.1,3.1S10.7,12.2,9,12.2z"
+                    fill="currentColor"></path>
+            </svg>
+            <span>EcoFinds</span>
+        </div>
+    </div>
+
+
+    <!-- Top Navigation Bar (Simplified for Mobile) -->
+    <header id="main-header" class="bg-white/90 backdrop-blur-lg shadow-sm sticky top-0 z-50 border-b border-gray-200">
+        <div class="container mx-auto px-4 sm:px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="#products" class="flex items-center gap-2 text-2xl font-bold text-emerald-700">
+                    <svg class="h-8 w-auto bg-emerald-100 text-emerald-600 rounded-lg p-1" viewBox="0 0 24 24"
+                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M16.6,15.2l-3.3-3.3c0.5-0.8,0.8-1.8,0.8-2.8c0-2.8-2.3-5.1-5.1-5.1S3.9,6.3,3.9,9.1s2.3,5.1,5.1,5.1c1,0,2-0.3,2.8-0.8l3.3,3.3c0.2,0.2,0.5,0.2,0.7,0l1.4-1.4C16.8,15.7,16.8,15.4,16.6,15.2z M9,12.2c-1.7,0-3.1-1.4-3.1-3.1s1.4-3.1,3.1-3.1s3.1,1.4,3.1,3.1S10.7,12.2,9,12.2z"
+                            fill="currentColor"></path>
+                    </svg>
+                    <span class="hidden sm:inline">EcoFinds</span>
+                </a>
+                <h1 id="header-title"
+                    class="text-xl font-bold text-slate-700 absolute left-1/2 -translate-x-1/2 transition-opacity duration-300">
+                </h1>
+                <a href="#cart" id="nav-cart" class="nav-link relative text-gray-600 hover:text-emerald-600">
+                    <i data-lucide="shopping-cart"></i>
+                    <span id="cart-count"
+                        class="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center border-2 border-white">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area: Added pb-24 for bottom nav spacing -->
+    <main class="container mx-auto p-4 md:p-6 pb-28">
+        <!-- Views will be dynamically shown/hidden here -->
+        <div id="products-view" class="view"></div>
+        <div id="product-detail-view" class="view"></div>
+        <div id="login-view" class="view"></div>
+        <div id="forgot-password-view" class="view"></div>
+        <div id="register-view" class="view"></div>
+        <div id="dashboard-view" class="view"></div>
+        <div id="listing-form-view" class="view"></div>
+        <div id="cart-view" class="view"></div>
+        <div id="orders-view" class="view"></div>
+    </main>
+
+    <!-- NEW Bottom Navigation Bar -->
+    <footer id="bottom-nav"
+        class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-gray-200 shadow-[0_-2px_20px_rgba(0,0,0,0.05)] z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-around h-20">
+                <a href="#products"
+                    class="bottom-nav-link flex-1 flex flex-col items-center justify-center text-gray-500 hover:text-emerald-600 transition-all duration-200">
+                    <i data-lucide="home"></i>
+                    <span class="text-xs mt-1 font-medium">Home</span>
+                </a>
+                <a href="#orders"
+                    class="bottom-nav-link flex-1 flex flex-col items-center justify-center text-gray-500 hover:text-emerald-600 transition-all duration-200">
+                    <i data-lucide="package"></i>
+                    <span class="text-xs mt-1 font-medium">Orders</span>
+                </a>
+                <a href="#dashboard" id="profile-nav-link"
+                    class="bottom-nav-link flex-1 flex flex-col items-center justify-center text-gray-500 hover:text-emerald-600 transition-all duration-200">
+                    <i data-lucide="user"></i>
+                    <span class="text-xs mt-1 font-medium">Profile</span>
+                </a>
+                <button id="logout-btn-mobile"
+                    class="hidden flex-1 flex-col items-center justify-center text-gray-500 hover:text-red-500 transition-colors">
+                    <i data-lucide="log-out"></i>
+                    <span class="text-xs mt-1 font-medium">Logout</span>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Generic Modal for Notifications -->
+    <div id="notification-modal"
+        class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4">
+        <div class="card max-w-sm w-full text-center transform transition-all duration-300 ease-out opacity-0 scale-95 -translate-y-4"
+            id="notification-content">
+            <div id="notification-icon" class="mx-auto mb-5"></div>
+            <p id="notification-message" class="text-xl font-medium text-slate-800"></p>
+            <button id="notification-close" class="btn mt-8 w-auto px-10 py-2.5 text-sm">Close</button>
+        </div>
+    </div>
+
+
+
+<!-- Backend starts here -->
+
+
+
+    <script>
+        // --- Service Worker Registration ---
+        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').then(reg => console.log('SW registered.'), err => console.log('SW registration failed: ', err)); }); }
+
+
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const app = {
+                state: { currentUser: null, products: [], users: [], cart: [], orders: [], categories: ['Upcycled', 'Handmade', 'Organic', 'Recycled', 'Sustainable Tech'] },
+                isInitialLoad: true,
+                installPromptEvent: null,
+
+                init() {
+                    this.loadData();
+                    this.router();
+                    this.attachEventListeners();
+                    lucide.createIcons();
+                    this.populateCategories();
+                    this.updateUI();
+                    this.isInitialLoad = false;
+                    setTimeout(() => {
+                        const splash = document.getElementById('splash-screen');
+                        if (splash) {
+                            splash.style.opacity = '0';
+                            setTimeout(() => splash.style.display = 'none', 500);
+                        }
+                    }, 1500);
+                },
+
+                vibrate() {
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate(50); // Vibrate for 50ms
+                    }
+                },
+
+                loadData() {
+                    this.state.users = JSON.parse(localStorage.getItem('ecofinds_users')) || [];
+                    this.state.products = JSON.parse(localStorage.getItem('ecofinds_products')) || [];
+                    this.state.currentUser = JSON.parse(localStorage.getItem('ecofinds_currentUser'));
+                    if (this.state.currentUser) {
+                        this.state.cart = JSON.parse(localStorage.getItem(`ecofinds_cart_${this.state.currentUser.email}`)) || [];
+                        this.state.orders = JSON.parse(localStorage.getItem(`ecofinds_orders_${this.state.currentUser.email}`)) || [];
+                    }
+                    if (this.state.products.length === 0) this.addDummyData();
+                },
+                saveData() {
+                    localStorage.setItem('ecofinds_users', JSON.stringify(this.state.users));
+                    localStorage.setItem('ecofinds_products', JSON.stringify(this.state.products));
+                    localStorage.setItem('ecofinds_currentUser', JSON.stringify(this.state.currentUser));
+                    if (this.state.currentUser) {
+                        localStorage.setItem(`ecofinds_cart_${this.state.currentUser.email}`, JSON.stringify(this.state.cart));
+                        localStorage.setItem(`ecofinds_orders_${this.state.currentUser.email}`, JSON.stringify(this.state.orders));
+                    }
+                },
+                addDummyData() {
+                    const dummyProducts = [
+                        { id: 1, title: 'Hand-Knit Wool Beanie', description: 'Cozy and warm beanie made from 100% organic wool.', category: 'Handmade', price: 499.00, imageUrl: 'https://placehold.co/600x400/a7e3a3/333?text=Wool+Beanie', sellerEmail: 'seller1@eco.com' },
+                        { id: 2, title: 'Recycled Glass Tumblers', description: 'Set of 4 beautiful tumblers made from recycled glass bottles.', category: 'Recycled', price: 799.00, imageUrl: 'https://placehold.co/600x400/7cb8e8/333?text=Glass+Tumblers', sellerEmail: 'seller1@eco.com' },
+                        { id: 3, title: 'Bamboo Toothbrush Pack', description: 'A pack of 5 biodegradable bamboo toothbrushes.', category: 'Organic', price: 249.00, imageUrl: 'https://placehold.co/600x400/e8d97c/333?text=Bamboo+Brush', sellerEmail: 'seller2@eco.com' },
+                        { id: 4, title: 'Upcycled Denim Tote Bag', description: 'Stylish and durable tote bag created from upcycled denim jeans.', category: 'Upcycled', price: 999.00, imageUrl: 'https://placehold.co/600x400/e87c7c/333?text=Denim+Tote', sellerEmail: 'seller2@eco.com' },
+                        { id: 5, title: 'Solar Powered Phone Charger', description: 'Charge your devices on the go with this portable solar charger.', category: 'Sustainable Tech', price: 1499.00, imageUrl: 'https://placehold.co/600x400/8c7ce8/333?text=Solar+Charger', sellerEmail: 'seller1@eco.com' },
+                        { id: 6, title: 'Organic Cotton T-Shirt', description: 'Soft and breathable T-shirt made from certified organic cotton.', category: 'Organic', price: 599.00, imageUrl: 'https://placehold.co/600x400/7ce8b2/333?text=Cotton+T-Shirt', sellerEmail: 'seller2@eco.com' },
+                    ];
+                    this.state.products = dummyProducts;
+                    const dummyUsers = [{ username: 'seller1', email: 'seller1@eco.com', password: 'password123' }, { username: 'seller2', email: 'seller2@eco.com', password: 'password123' }];
+                    this.state.users.push(...dummyUsers.filter(du => !this.state.users.some(u => u.email === du.email)));
+                    this.saveData();
+                },
+
+                router() {
+                    const hash = window.location.hash || '#products';
+                    document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+
+                    const authRoutes = ['#login', '#register', '#forgot-password'];
+                    const protectedRoutes = ['#dashboard', '#create-listing', '#edit-listing', '#cart', '#orders'];
+                    const mainHeader = document.getElementById('main-header');
+                    const bottomNav = document.getElementById('bottom-nav');
+
+                    const isAuthRoute = authRoutes.includes(hash);
+                    mainHeader.style.display = isAuthRoute ? 'none' : '';
+                    bottomNav.style.display = isAuthRoute ? 'none' : '';
+
+                    if (isAuthRoute && this.state.currentUser) { window.location.hash = '#products'; return; }
+                    if (protectedRoutes.includes(hash.split('/')[0]) && !this.state.currentUser) {
+                        if (!this.isInitialLoad) this.showNotification('You must be logged in.', 'error');
+                        window.location.hash = '#login';
+                        return;
+                    }
+
+                    this.updateHeaderTitle(hash);
+                    this.updateBottomNavActiveState(hash);
+
+                    let viewId, activeView;
+                    if (hash.startsWith('#product/')) {
+                        this.renderProductDetail(parseInt(hash.split('/')[1]));
+                        activeView = document.querySelector('#product-detail-view');
+                    } else if (hash.startsWith('#edit-listing/')) {
+                        this.populateListingForm(parseInt(hash.split('/')[1]));
+                        activeView = document.querySelector('#listing-form-view');
+                    } else if (hash === '#create-listing') {
+                        this.populateListingForm();
+                        activeView = document.querySelector('#listing-form-view');
+                    } else {
+                        viewId = `${hash}-view`;
+                        activeView = document.querySelector(viewId) || document.querySelector('#products-view');
+                        const renderFunc = this.getRenderFunctionForView(hash);
+                        if (renderFunc) renderFunc.call(this);
+                    }
+
+                    if (activeView) activeView.classList.add('active');
+                    window.scrollTo(0, 0);
+                },
+
+                getRenderFunctionForView(hash) {
+                    const viewMap = {
+                        '#products': this.renderProducts,
+                        '#login': this.renderLoginForm,
+                        '#register': this.renderRegisterForm,
+                        '#forgot-password': this.renderForgotPasswordForm,
+                        '#dashboard': this.renderDashboard,
+                        '#cart': this.renderCart,
+                        '#orders': this.renderOrders,
+                    };
+                    return viewMap[hash];
+                },
+
+                attachEventListeners() {
+                    window.addEventListener('hashchange', () => this.router());
+                    window.addEventListener('beforeinstallprompt', (e) => this.handleInstallPrompt(e));
+                    document.getElementById('logout-btn-mobile').addEventListener('click', () => { this.vibrate(); this.handleLogout(); });
+
+                    document.body.addEventListener('submit', (e) => {
+                        const formHandlers = { 'register-form': this.handleRegister, 'login-form': this.handleLogin, 'forgot-password-form': this.handleForgotPassword, 'profile-form': this.handleProfileUpdate, 'listing-form': this.handleListingSubmit };
+                        if (formHandlers[e.target.id]) { this.vibrate(); formHandlers[e.target.id].call(this, e); }
+                    });
+
+                    document.body.addEventListener('click', (e) => {
+                        const clickHandlers = { '.delete-listing-btn': this.deleteListing, '.add-to-cart-btn': this.addToCart, '.remove-from-cart-btn': this.removeFromCart, '#install-app-btn': this.handleInstallClick };
+                        for (const selector in clickHandlers) {
+                            if (e.target.closest(selector)) {
+                                this.vibrate();
+                                clickHandlers[selector].call(this, e.target.closest(selector).dataset.id);
+                            }
+                        }
+                        if (e.target.closest('.bottom-nav-link')) {
+                            this.vibrate();
+                        }
+                        if (e.target.id === 'checkout-btn') { this.vibrate(); this.handleCheckout(); }
+                    });
+
+                    document.body.addEventListener('input', (e) => { if (e.target.id === 'search-input') this.renderProducts(); });
+                    document.body.addEventListener('change', (e) => { if (e.target.id === 'category-filter') this.renderProducts(); });
+                    document.querySelector('#notification-close').addEventListener('click', () => { this.vibrate(); this.hideNotification(); });
+                },
+
+                handleInstallPrompt(e) {
+                    e.preventDefault();
+                    this.installPromptEvent = e;
+                    this.renderDashboard(); // Re-render dashboard to show the button
+                },
+
+                handleInstallClick() {
+                    if (!this.installPromptEvent) {
+                        return;
+                    }
+                    this.installPromptEvent.prompt();
+                    this.installPromptEvent.userChoice.then(choiceResult => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted the A2HS prompt');
+                        } else {
+                            console.log('User dismissed the A2HS prompt');
+                        }
+                        this.installPromptEvent = null;
+                        this.renderDashboard(); // Re-render to hide button
+                    });
+                },
+
+                updateUI() {
+                    const profileLink = document.getElementById('profile-nav-link');
+                    const logoutBtn = document.getElementById('logout-btn-mobile');
+                    if (this.state.currentUser) {
+                        profileLink.href = '#dashboard';
+                        logoutBtn.classList.remove('hidden');
+                        logoutBtn.classList.add('flex');
+                    } else {
+                        profileLink.href = '#login';
+                        logoutBtn.classList.add('hidden');
+                        logoutBtn.classList.remove('flex');
+                    }
+                    this.updateCartCount();
+                    lucide.createIcons();
+                },
+                updateHeaderTitle(hash) {
+                    const titleEl = document.getElementById('header-title');
+                    const titles = { '#products': '', '#cart': 'Shopping Cart', '#orders': 'My Orders', '#dashboard': 'Dashboard', '#create-listing': 'New Listing', '#product': 'Product Details', '#edit-listing': 'Edit Listing' };
+                    titleEl.textContent = titles[hash.split('/')[0]] || '';
+                },
+                updateBottomNavActiveState(hash) {
+                    document.querySelectorAll('.bottom-nav-link').forEach(link => {
+                        const linkHash = link.getAttribute('href');
+                        const isPartiallyActive = (hash.startsWith('#dashboard') || hash.startsWith('#create-listing') || hash.startsWith('#edit-listing')) && linkHash === '#dashboard';
+                        link.classList.toggle('active', linkHash === hash || isPartiallyActive);
+                    });
+                },
+
+                renderEmptyState(icon, title, subtitle) {
+                    return `
+                    <div class="text-center py-16 px-4">
+                        <div class="inline-block bg-emerald-100 text-emerald-500 p-5 rounded-full">
+                            <i data-lucide="${icon}" class="w-16 h-16"></i>
+                        </div>
+                        <h2 class="mt-6 text-2xl font-bold text-slate-800">${title}</h2>
+                        <p class="mt-2 text-slate-500">${subtitle}</p>
+                    </div>`;
+                },
+
+                renderProducts() {
+                    const viewEl = document.getElementById('products-view');
+                    const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
+                    const category = document.getElementById('category-filter')?.value || 'all';
+                    let filteredProducts = this.state.products;
+
+                    if (searchTerm) filteredProducts = filteredProducts.filter(p => p.title.toLowerCase().includes(searchTerm));
+                    if (category !== 'all') filteredProducts = filteredProducts.filter(p => p.category === category);
+
+                    let productListHTML = this.renderEmptyState('search', 'No Products Found', 'Try adjusting your search or filter criteria.');
+                    if (filteredProducts.length > 0) {
+                        productListHTML = filteredProducts.map(product => `
+                        <div class="product-card group">
+                            <a href="#product/${product.id}">
+                                <div class="relative"><img src="${product.imageUrl}" alt="${product.title}" class="w-full h-48 object-cover"><div class="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors"></div></div>
+                                <div class="p-4">
+                                    <h3 class="font-bold text-md text-slate-800 truncate">${product.title}</h3>
+                                    <p class="text-slate-600 mt-1 font-extrabold text-lg">₹${product.price.toFixed(2)}</p>
+                                </div>
+                            </a>
+                        </div>`).join('');
+                    }
+
+                    viewEl.innerHTML = `
+                        <header class="mb-6 text-center">
+                            <h1 class="text-3xl font-extrabold text-slate-800">Discover Sustainable Goods</h1>
+                        </header>
+                        <div class="flex flex-col md:flex-row gap-4 mb-6 sticky top-[73px] bg-gray-50/90 backdrop-blur-sm z-10 py-4">
+                            <div class="flex-grow relative"><input type="text" id="search-input" placeholder="Search products..." value="${searchTerm}" class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl bg-white"><i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i></div>
+                            <div class="w-full md:w-1/3"><select id="category-filter" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white"></select></div>
+                        </div>
+                        <div id="product-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">${productListHTML}</div>
+                    `;
+                    this.populateCategories();
+                    document.getElementById('category-filter').value = category;
+                    lucide.createIcons();
+                },
+
+                renderProductDetail(id) {
+                    const product = this.state.products.find(p => p.id === id);
+                    const detailEl = document.querySelector('#product-detail-view');
+                    if (!product) { detailEl.innerHTML = this.renderEmptyState('alert-circle', 'Product Not Found', 'This product may have been removed.'); lucide.createIcons(); return; }
+                    detailEl.innerHTML = `
+                        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                            <img src="${product.imageUrl}" alt="${product.title}" class="w-full h-72 object-cover">
+                            <div class="p-6">
+                                <span class="text-sm font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">${product.category}</span>
+                                <h1 class="text-4xl font-extrabold mt-4 text-slate-800">${product.title}</h1>
+                                <p class="text-3xl text-emerald-600 font-black my-4">₹${product.price.toFixed(2)}</p>
+                                <p class="text-slate-600 leading-relaxed mb-6">${product.description}</p>
+                                <button data-id="${product.id}" class="add-to-cart-btn btn flex items-center justify-center gap-2">
+                                    <i data-lucide="shopping-cart"></i> Add to Cart
+                                </button>
+                            </div>
+                        </div>`;
+                    lucide.createIcons();
+                },
+
+                renderDashboard() {
+                    const user = this.state.currentUser;
+                    const viewEl = document.getElementById('dashboard-view');
+                    const userProducts = this.state.products.filter(p => p.sellerEmail === user.email);
+                    let productListHTML = this.renderEmptyState('package-plus', 'No Listings Yet', 'Click the "New Listing" button to add your first product.');
+                    if (userProducts.length > 0) {
+                        productListHTML = userProducts.map(p => `<div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border"><div class="flex items-center gap-4"><img src="${p.imageUrl}" alt="${p.title}" class="w-16 h-16 object-cover rounded-lg"><div><h4 class="font-semibold text-slate-700">${p.title}</h4><p class="text-sm text-slate-500">₹${p.price.toFixed(2)}</p></div></div><div class="flex gap-2"><a href="#edit-listing/${p.id}" class="text-blue-500 p-2"><i data-lucide="edit"></i></a><button data-id="${p.id}" class="delete-listing-btn text-red-500 p-2"><i data-lucide="trash-2"></i></button></div></div>`).join('');
+                    }
+
+                    let installButtonHTML = '';
+                    if (this.installPromptEvent) {
+                        installButtonHTML = `<button id="install-app-btn" class="btn w-full flex items-center justify-center gap-2"><i data-lucide="download-cloud"></i> Install App</button>`;
+                    } else {
+                        installButtonHTML = `<p class="text-center text-sm text-slate-500">App is installed or browser not supported.</p>`
+                    }
+
+                    viewEl.innerHTML = `<div class="space-y-8"><div class="card"><h3 class="text-2xl font-bold mb-4">Your Profile</h3><form id="profile-form"><label class="font-medium">Username</label><input type="text" id="dashboard-username" class="form-input" value="${user.username}" required><label class="mt-4 block font-medium">Email</label><input type="email" class="form-input bg-gray-100" value="${user.email}" disabled><button type="submit" class="w-auto px-8 btn text-sm">Save</button></form></div><div class="card"><h3 class="text-2xl font-bold mb-4">App Settings</h3>${installButtonHTML}</div><div class="card"><div class="flex justify-between items-center mb-4"><h3 class="text-2xl font-bold">Your Listings</h3><a href="#create-listing" class="bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold"><i data-lucide="plus" class="w-5 h-5"></i>New</a></div><div class="space-y-4">${productListHTML}</div></div></div>`;
+                    lucide.createIcons();
+                },
+
+                populateListingForm(id = null) {
+                    const formView = document.getElementById('listing-form-view');
+                    let formTitle = 'Create New Listing', product = { id: '', title: '', description: '', category: '', price: '', imageUrl: '' };
+                    if (id) {
+                        const p = this.state.products.find(p => p.id === id);
+                        if (p && p.sellerEmail === this.state.currentUser.email) { product = p; formTitle = 'Edit Your Listing'; }
+                        else { window.location.hash = '#dashboard'; this.showNotification("You can't edit this.", 'error'); return; }
+                    }
+                    formView.innerHTML = `<div class="card"><h2 class="text-3xl font-bold text-center mb-6">${formTitle}</h2><form id="listing-form" class="space-y-4"><input type="hidden" id="listing-id" value="${product.id}"><div><label class="font-medium">Title</label><input type="text" id="listing-title" class="form-input" value="${product.title}" required></div><div><label class="font-medium">Description</label><textarea id="listing-description" rows="4" class="form-input" required>${product.description}</textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="font-medium">Category</label><select id="listing-category" class="form-input" required value="${product.category}"></select></div><div><label class="font-medium">Price (₹)</label><input type="number" id="listing-price" class="form-input" value="${product.price}" required></div></div><div><label class="font-medium">Image URL</label><input type="text" id="listing-image" class="form-input" value="${product.imageUrl}" required></div><div class="flex flex-col sm:flex-row gap-4 pt-4"><button type="submit" class="btn">Save</button><a href="#dashboard" class="btn-secondary text-center">Cancel</a></div></form></div>`;
+                    this.populateCategories(); if (id) document.querySelector('#listing-category').value = product.category;
+                },
+
+                renderCart() {
+                    const viewEl = document.getElementById('cart-view');
+                    if (this.state.cart.length === 0) { viewEl.innerHTML = this.renderEmptyState('shopping-cart', 'Your Cart is Empty', 'Browse our products to find something you\'ll love.'); lucide.createIcons(); return; }
+                    const itemsHTML = this.state.cart.map(item => { const product = this.state.products.find(p => p.id === item.productId); return `<div class="flex items-center justify-between border-b last:border-b-0 py-4"><div class="flex items-center gap-4"><img src="${product.imageUrl}" alt="${product.title}" class="w-20 h-20 object-cover rounded-xl"><div><h4 class="font-semibold text-lg">${product.title}</h4><p>₹${product.price.toFixed(2)}</p></div></div><button data-id="${product.id}" class="remove-from-cart-btn text-red-500 p-2"><i data-lucide="x-circle"></i></button></div>`; }).join('');
+                    const total = this.state.cart.reduce((sum, item) => sum + this.state.products.find(p => p.id === item.productId).price, 0);
+                    viewEl.innerHTML = `<div class="card">${itemsHTML}</div><div class="mt-6"><div class="card"><div class="flex justify-between items-center mb-4"><span class="text-lg font-medium">Total:</span><span class="text-3xl font-black">₹${total.toFixed(2)}</span></div><button id="checkout-btn" class="btn w-full">Checkout</button></div></div>`;
+                    lucide.createIcons();
+                },
+
+                renderOrders() {
+                    const container = document.getElementById('orders-view');
+                    if (this.state.orders.length === 0) { container.innerHTML = this.renderEmptyState('package-check', 'No Orders Yet', 'Your past purchases will appear here.'); lucide.createIcons(); return; }
+                    container.innerHTML = `<div class="space-y-6">${this.state.orders.map(order => `<div class="card"><div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-semibold text-lg">Order #${order.id}</h3><p class="font-bold text-xl">₹${order.total.toFixed(2)}</p></div><div class="space-y-3">${order.items.map(item => `<div class="flex justify-between"><span>${item.title}</span><span>₹${item.price.toFixed(2)}</span></div>`).join('')}</div></div>`).join('')}</div>`;
+                },
+
+                renderAuthForm(viewId, title, formHTML, footerHTML) {
+                    document.getElementById(viewId).innerHTML = `<div class="min-h-screen flex items-center justify-center p-4 bg-gray-100"><div class="max-w-md w-full space-y-8 p-8 sm:p-10 bg-white shadow-xl rounded-2xl"><h2 class="text-center text-3xl font-extrabold text-gray-900">${title}</h2>${formHTML}${footerHTML}</div></div>`;
+                    lucide.createIcons();
+                },
+                renderLoginForm() { this.renderAuthForm('login-view', 'Sign in', `<form id="login-form" class="mt-8 space-y-6"><div class="relative"><i data-lucide="mail" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i><input type="email" id="login-email" required class="form-input pl-12" placeholder="Email"></div><div class="relative"><i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i><input type="password" id="login-password" required class="form-input pl-12" placeholder="Password"></div><div class="text-sm text-right"><a href="#forgot-password" class="font-medium text-emerald-600">Forgot?</a></div><button type="submit" class="btn">Sign in</button></form>`, `<p class="text-center text-sm">Not a member? <a href="#register" class="font-medium text-emerald-600">Sign up</a></p>`); },
+                renderRegisterForm() { this.renderAuthForm('register-view', 'Create Account', `<form id="register-form" class="space-y-4 mt-8"><div class="relative"><i data-lucide="user" class="absolute left-4 top-1/2 -translate-y-1/2"></i><input type="text" id="register-username" class="form-input pl-12" placeholder="Username" required></div><div class="relative"><i data-lucide="mail" class="absolute left-4 top-1/2 -translate-y-1/2"></i><input type="email" id="register-email" class="form-input pl-12" placeholder="Email" required></div><div class="relative"><i data-lucide="lock" class="absolute left-4 top-1/2 -translate-y-1/2"></i><input type="password" id="register-password" class="form-input pl-12" placeholder="Password" required></div><button type="submit" class="btn">Register</button></form>`, `<p class="text-center text-sm">Have an account? <a href="#login" class="font-medium text-emerald-600">Login</a>.</p>`); },
+                renderForgotPasswordForm() { this.renderAuthForm('forgot-password-view', 'Reset Password', `<p class="mt-2 text-center text-sm text-gray-600">Enter your email for a reset link.</p><form id="forgot-password-form" class="mt-8 space-y-6"><div class="relative"><i data-lucide="mail" class="absolute left-4 top-1/2 -translate-y-1/2"></i><input id="forgot-email" type="email" required class="form-input pl-12" placeholder="Email"></div><button type="submit" class="btn">Send Link</button></form>`, `<p class="text-center text-sm">Remembered? <a href="#login" class="font-medium text-emerald-600">Sign in</a></p>`); },
+
+                populateCategories() {
+                    const selects = document.querySelectorAll('#category-filter, #listing-category');
+                    selects.forEach(select => { if (!select) return; const firstOptionHTML = select.options[0] ? select.options[0].outerHTML : '<option value="" disabled selected>Select category</option>'; select.innerHTML = select.id === 'category-filter' ? '<option value="all">All Categories</option>' : firstOptionHTML; this.state.categories.forEach(cat => select.innerHTML += `<option value="${cat}">${cat}</option>`); });
+                },
+                updateCartCount() {
+                    const cartCountEl = document.querySelector('#cart-count'), count = this.state.cart.length;
+                    cartCountEl.textContent = count; cartCountEl.classList.toggle('hidden', count === 0);
+                },
+                showNotification(message, type = 'success') {
+                    const modal = document.querySelector('#notification-modal'), content = document.querySelector('#notification-content'), iconContainer = document.querySelector('#notification-icon');
+                    iconContainer.innerHTML = type === 'success' ? `<i data-lucide="check-circle" class="w-16 h-16 text-emerald-500"></i>` : `<i data-lucide="x-circle" class="w-16 h-16 text-red-500"></i>`;
+                    lucide.createIcons(); document.querySelector('#notification-message').textContent = message; modal.classList.remove('hidden');
+                    setTimeout(() => content.classList.remove('opacity-0', 'scale-95', '-translate-y-4'), 50);
+                },
+                hideNotification() {
+                    const modal = document.querySelector('#notification-modal'), content = document.querySelector('#notification-content');
+                    content.classList.add('opacity-0', 'scale-95', '-translate-y-4');
+                    setTimeout(() => modal.classList.add('hidden'), 300);
+                },
+// here the back process for checkout and cart are taken care of
+                handleRegister(e) { e.preventDefault(); const username = e.target.elements['register-username'].value, email = e.target.elements['register-email'].value, password = e.target.elements['register-password'].value; if (this.state.users.some(u => u.email === email)) { this.showNotification('Email already exists.', 'error'); return; } this.state.users.push({ username, email, password }); this.saveData(); e.target.reset(); this.showNotification('Registration successful!'); window.location.hash = '#login'; },
+                handleLogin(e) { e.preventDefault(); const email = e.target.elements['login-email'].value, password = e.target.elements['login-password'].value, user = this.state.users.find(u => u.email === email && u.password === password); if (user) { this.state.currentUser = { username: user.username, email: user.email }; this.saveData(); this.loadData(); this.updateUI(); e.target.reset(); window.location.hash = '#products'; } else { this.showNotification('Invalid email or password.', 'error'); } },
+                handleForgotPassword(e) { e.preventDefault(); if (!e.target.elements['forgot-email'].value) { this.showNotification('Please enter an email.', 'error'); return; } this.showNotification('If an account exists, a reset link has been sent.'); window.location.hash = '#login'; },
+                handleLogout() { this.state.currentUser = null; this.state.cart = []; this.state.orders = []; localStorage.removeItem('ecofinds_currentUser'); this.updateUI(); window.location.hash = '#login'; },
+                handleProfileUpdate(e) { e.preventDefault(); const newUsername = e.target.elements['dashboard-username'].value, userInDb = this.state.users.find(u => u.email === this.state.currentUser.email); if (userInDb) userInDb.username = newUsername; this.state.currentUser.username = newUsername; this.saveData(); this.showNotification('Profile updated!'); },
+                handleListingSubmit(e) { e.preventDefault(); const id = e.target.elements['listing-id'].value, listingData = { title: e.target.elements['listing-title'].value, description: e.target.elements['listing-description'].value, category: e.target.elements['listing-category'].value, price: parseFloat(e.target.elements['listing-price'].value), imageUrl: e.target.elements['listing-image'].value, sellerEmail: this.state.currentUser.email }; if (id) { const index = this.state.products.findIndex(p => p.id === parseInt(id)); this.state.products[index] = { ...this.state.products[index], ...listingData }; this.showNotification('Listing updated!'); } else { listingData.id = Date.now(); this.state.products.unshift(listingData); this.showNotification('Listing created!'); } this.saveData(); e.target.reset(); window.location.hash = '#dashboard'; },
+                deleteListing(id) { if (confirm('Delete this listing?')) { this.state.products = this.state.products.filter(p => p.id !== parseInt(id)); this.saveData(); this.renderDashboard(); this.showNotification('Listing deleted.'); } },
+                addToCart(productId) { if (!this.state.currentUser) { this.showNotification('Please log in first.'); window.location.hash = '#login'; return; } if (this.state.cart.some(item => item.productId === parseInt(productId))) { this.showNotification('Item already in cart.', 'error'); return; } this.state.cart.push({ productId: parseInt(productId) }); this.saveData(); this.updateCartCount(); this.showNotification('Item added to cart!'); },
+                removeFromCart(productId) { this.state.cart = this.state.cart.filter(item => item.productId !== parseInt(productId)); this.saveData(); this.updateCartCount(); this.renderCart(); this.showNotification('Item removed from cart.'); },
+                handleCheckout() { if (this.state.cart.length === 0) return; const newOrder = { id: Date.now(), date: new Date().toISOString(), items: this.state.cart.map(item => { const p = this.state.products.find(prod => prod.id === item.productId); return { title: p.title, price: p.price }; }), total: this.state.cart.reduce((sum, item) => sum + this.state.products.find(p => p.id === item.productId).price, 0) }; this.state.orders.unshift(newOrder); this.state.cart = []; this.saveData(); this.updateCartCount(); this.showNotification('Thank you for your purchase!'); window.location.hash = '#orders'; },
+            };
+            app.init();
+        });
+    </script>
+</body>
+
+</html>
